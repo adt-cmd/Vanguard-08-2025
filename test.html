@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toggle Switch</title>
+<style>
+.status-checkbox {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 50px;
+  height: 28px;
+  background: #ccc;
+  border-radius: 34px;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  transition: background .3s;
+}
+
+.status-checkbox::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  bottom: 3px;
+  width: 22px;
+  height: 22px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform .3s;
+}
+
+.status-checkbox:checked {
+  background: #72C98A;
+}
+
+.status-checkbox:checked::before {
+  transform: translateX(22px);
+}
+</style>
+</head>
+<body>
+
+<h3>Toggle Switch Example</h3>
+
+<input type="checkbox" class="status-checkbox">
+
+</body>
+</html>

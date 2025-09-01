@@ -304,3 +304,37 @@ input[type="number"]::-webkit-inner-spin-button {
 	border-radius: 5px;
 	margin-top: 3px;
 }
+/* Status management Sep 01, 2025 */
+.status-checkbox {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 50px;
+  height: 28px;
+  background: #ccc;
+  border-radius: 34px;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  transition: background .3s;
+}
+.status-checkbox::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  bottom: 2px;
+  width: 22px;
+  height: 22px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform .3s;
+}
+.status-checkbox:checked {
+  background: #72C98A;
+}
+.status-checkbox:checked::before {
+  transform: translateX(21px);
+}
+.status-checkbox:disabled {      /* darker gray when disabled */
+  cursor: not-allowed;    /* change cursor */
+  opacity: 0.5;           /* make it look inactive */
+}

@@ -24,7 +24,7 @@ ZOHO.embeddedApp.on("PageLoad", function (data) {
 				if (data.data) {
 					let hasActiveComponent = false;
 					data.data.forEach(component => {
-						if (component.Status == "Active") {
+						if (component.Status == "Active" || component.Status  == "Inactive") {
 							console.log("yo");
 							hasActiveComponent = true;
 							oldActiveComponentIds.push(component.id)
@@ -37,6 +37,7 @@ ZOHO.embeddedApp.on("PageLoad", function (data) {
 								},
 								"Specification": component.Specifications,
 								"Quantity": component.Quantity,
+								"Status": component.Status == "Active" ? true : false,
 							};
 							ZOHO.CRM.API.searchRecord({
 								Entity: "Components_X_Vendors",
@@ -187,7 +188,7 @@ function appendComponentRow(tableId, existingComponentData) {
 			{ elementType: 'div', classes: ['quantity-field-div', 'required', 'field-data-content-con'], defaultValue: existingComponentData?.Quantity || "", attributes: [['onclick', 'focusOnInputField(event.target)']], errorMsg: "Input valid quantity" },
 			{ elementType: 'div', classes: ['bidders-div', 'relative'], errorMsg: "Add at least one vendor" },
 			{ elementType: 'div', classes: ['attachments-div', 'relative'] },
-			{ elementType: 'button', classes: ['remove-btn'], content: '❌', attributes: [['onclick', 'removeComponentRow(event)']] }
+			{ elementType: 'input', type: 'checkbox', classes: ['status-checkbox'],  attributes: existingComponentData?.Status != false ? [['checked', true]] : []}
 		];
 
 	if (existingComponentData) {
@@ -297,15 +298,16 @@ function appendComponentRow(tableId, existingComponentData) {
 		$('#allComponents').find('.field-data-content-con').addClass('disabled').attr('onclick', false)
 		$('#allComponents').find('.remove-btn').remove()
 		$('#allComponents').find('.attachments-div').addClass('disabled').attr('onclick', false)
+		$('#allComponents').find('.checkbox-status').addClass('disabled').attr('onclick', false)
 	}
 	establishListenerOnFileField();
 }
 
-function removeComponentRow(event) {
-	xBtn = event.target;
-	componentRow = xBtn.closest('.component-row');
-	componentRow.remove();
-}
+// function removeComponentRow(event) {
+// 	xBtn = event.target;
+// 	componentRow = xBtn.closest('.component-row');
+// 	componentRow.remove();
+// }
 
 // Product lookup field
 
@@ -576,6 +578,7 @@ function validateComponentForm() {
 }
 
 function saveComponentForm(event) {
+	
 	if (validateComponentForm()) {
 		$(event.target).text("Saving...");
 		$(event.target).attr("disabled", true);
@@ -586,6 +589,7 @@ function saveComponentForm(event) {
 			let componentName = $(element).find('.component-name').first(),
 				product = $(element).find('.product-id').first(),
 				specification = $(element).find('.specification').first(),
+				status = $(element).find('.status-checkbox').first().prop('checked') ? "Active" : "Inactive",
 				existingQty = $(element).find('.qty-input-field').first(),
 				qtyValues = $(element).find('.qty-values').first(),
 				bidders = $(element).find('.bidder-ids').first(),
@@ -596,7 +600,7 @@ function saveComponentForm(event) {
 					"Specifications": specification.val(),
 					"Deal": id[0],
 					"Quantity": existingQty.val(),
-					"Status": 'Active',
+					"Status": status,
 					"BidderIDs": bidders.val().split(',')
 				};
 			componentId = element.getAttribute("component-id");
@@ -609,7 +613,6 @@ function saveComponentForm(event) {
 				insertComponent(componentObj, qtyValues.val().split(','), element);
 			}
 		})
-		setRemovedComponentsToInactive(currentComponentIds);
 		setTimeout(function () {
 			$(event.target).text("Save");
 			ZOHO.CRM.UI.Popup.closeReload();
@@ -673,30 +676,6 @@ async function updateComponent(componentObj) {
 				})
 		})
 }
-
-function setRemovedComponentsToInactive(currentComponentIds) {
-	oldActiveComponentIds.forEach(oldActiveComponentId => {
-		if (!currentComponentIds.includes(oldActiveComponentId)) {
-			var config = {
-				Entity: "Components",
-				APIData: {
-					"id": oldActiveComponentId,
-					"Status": "Inactive"
-				},
-				Trigger: ["workflow"]
-			}
-			ZOHO.CRM.API.updateRecord(config)
-		}
-	})
-}
-
-// disable widget at deal stage qualification
-// function disableActionsInWidgetForm(dealStage) {
-// 	if (dealStage != "Qualification") {
-// 		$('.add-row-btn').remove();
-// 		$('.save-btn').remove();
-// 	}
-// }
 
 //disable widget if rfq checkbox is clicked
 function disableActionsInWidgetForm(dealRFQCheckbox) {
