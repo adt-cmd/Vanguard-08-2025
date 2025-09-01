@@ -21,7 +21,8 @@ ZOHO.embeddedApp.on("PageLoad", function (data) {
 			RelatedList: "Component_Lists"
 		})
 			.then(function (data) {
-				if (data.data) {
+				allComponents = data;
+				if (allComponents.data) {
 					let hasActiveComponent = false;
 					data.data.forEach(component => {
 						if (component.Status == "Active") {
@@ -30,6 +31,7 @@ ZOHO.embeddedApp.on("PageLoad", function (data) {
 							oldActiveComponentIds.push(component.id)
 							let componentData = {
 								"Id": component.id,
+								"Order": component.Order,
 								"Name": component.Name,
 								"Product": {
 									"Name": component.Product.name,
@@ -75,7 +77,7 @@ ZOHO.embeddedApp.on("PageLoad", function (data) {
 											// pass on deal stage variable
 											// appendComponentRow("allComponents", componentData, dealStage);
 											// pass on rfq checkbox variable
-											appendComponentRow("allComponents", componentData, dealRFQCheckbox);
+											appendComponentRow("allComponents", componentData, allComponents.data.length);
 										})
 								})
 						}
@@ -175,12 +177,13 @@ function handleRemoveFile(event) {
 
 // Component Row
 
-function appendComponentRow(tableId, existingComponentData) {
+function appendComponentRow(tableId, existingComponentData, existingComponentLength) {
 	const table = document.getElementById(tableId),
 		tbody = table.querySelector('tbody'),
 		trClassNames = existingComponentData ? ['existing-component', 'component-row'] : ['component-row'],
 		newRow = createElementWithClass('tr', trClassNames),
 		cellDataArray = [
+			{ elementType: 'input', type: 'text', classes: ['component-order'], defaultValue: existingComponentData?.Order || tbody.getElementsByTagName('tr').length},
 			{ elementType: 'input', type: 'text', classes: ['component-name', 'required', 'required-data-field'], defaultValue: existingComponentData?.Name || "", errorMsg: "Component name cannot be empty" },
 			{ elementType: 'div', classes: ['relative', 'product-field'], errorMsg: "Product cannot be empty" },
 			{ elementType: 'textarea', classes: ['specification', 'required', 'required-data-field'], defaultValue: existingComponentData?.Specification || "", errorMsg: "Specification cannot be empty" },
@@ -299,6 +302,20 @@ function appendComponentRow(tableId, existingComponentData) {
 		$('#allComponents').find('.attachments-div').addClass('disabled').attr('onclick', false)
 	}
 	establishListenerOnFileField();
+	$tbody = $('#allComponents tbody');
+	console.log(existingComponentLength);
+	// Get rows as an array
+	var rows = $tbody.find('tr').get();
+	if (existingComponentLength == rows.length - 1) {
+		rows.sort(function(a, b) {
+				var orderA = parseInt($(a).find('.component-order').val(), 10);
+				var orderB = parseInt($(b).find('.component-order').val(), 10);
+				return orderA - orderB; // ascending
+		});
+		$.each(rows, function(index, row) {
+				$tbody.append(row);
+		});
+	}
 }
 
 function removeComponentRow(event) {
@@ -582,7 +599,9 @@ function saveComponentForm(event) {
 		$(event.target).removeClass("save-btn");
 		$(event.target).addClass("disabled-btn");
 		let currentComponentIds = [];
-		$('.component-row').each(function (index, element) {
+		let rows = $('.component-row').get();
+		let order = 1;
+		$.each(rows, function (index, element) {
 			let componentName = $(element).find('.component-name').first(),
 				product = $(element).find('.product-id').first(),
 				specification = $(element).find('.specification').first(),
@@ -596,6 +615,7 @@ function saveComponentForm(event) {
 					"Specifications": specification.val(),
 					"Deal": id[0],
 					"Quantity": existingQty.val(),
+					"Order": order,
 					"Status": 'Active',
 					"BidderIDs": bidders.val().split(',')
 				};
@@ -605,8 +625,11 @@ function saveComponentForm(event) {
 				componentObj["id"] = componentId;
 				updateComponent(componentObj);
 				uploadFiles(element, componentId)
+				order++;
 			} else {
-				insertComponent(componentObj, qtyValues.val().split(','), element);
+				duplicateComponents = qtyValues.val().split(',');
+				insertComponent(componentObj, duplicateComponents, element, order);
+				order += duplicateComponents.length;
 			}
 		})
 		setRemovedComponentsToInactive(currentComponentIds);
@@ -617,9 +640,12 @@ function saveComponentForm(event) {
 	}
 }
 
-async function insertComponent(componentObj, qtyValues, element) {
+async function insertComponent(componentObj, qtyValues, element, startingOrder) {
+	let duplicateOrder = startingOrder;
 	await $(qtyValues).each(async function (index, qty) {
 		componentObj["Quantity"] = parseInt(qty);
+		componentObj["Order"] = duplicateOrder;
+		duplicateOrder++;
 		await ZOHO.CRM.API.insertRecord({ Entity: "Components", APIData: componentObj, Trigger: ["workflow"] })
 			.then(async function (data) {
 				if (data?.data[0]?.code == 'SUCCESS') {
@@ -634,7 +660,7 @@ async function insertComponent(componentObj, qtyValues, element) {
 					}
 					uploadFiles(element, data?.data[0]?.details?.id);
 				}
-			})
+		})
 	})
 }
 

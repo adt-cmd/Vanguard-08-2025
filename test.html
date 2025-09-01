@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sortable Table Rows</title>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
+<style>
+table { border-collapse: collapse; width: 60%; }
+th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+tr.ui-sortable-helper { background: #f0f0f0; } /* Highlight row while dragging */
+</style>
+<script>
+$(function() {
+  $("#sortable tbody").sortable({
+    helper: function(e, tr) {
+      var $originals = tr.children();
+      var $helper = tr.clone();
+      $helper.children().each(function(index) {qqq
+        $(this).width($originals.eq(index).width());
+      });
+      return $helper;
+    },
+    cursor: "move"
+  }).disableSelection();
+});
+</script>
+</head>
+<body>
+
+<h3>Sortable Table Rows</h3>
+<table id="sortable">
+  <thead>
+    <tr>
+      <th>Item</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>Item 1</td><td>Description 1</td></tr>
+    <tr><td>Item 2</td><td>Description 2</td></tr>
+    <tr><td>Item 3</td><td>Description 3</td></tr>
+    <tr><td>Item 4</td><td>Description 4</td></tr>
+  </tbody>
+</table>
+
+</body>
+</html>
