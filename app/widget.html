@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://live.zwidgets.com/js-sdk/1.1/ZohoEmbededAppSDK.min.js"></script>
+    <link rel="stylesheet" href="css/style.css"> 
+    <script src="js/index.js"></script>
+  </head>
+  <body>
+    <input type="hidden" id="deal-name">
+    <table id="allComponents">
+      <tr>
+        <th>Component Name</th>
+        <th>Product</th>
+        <th>Specifications</th>
+        <th>Quantity</th>
+        <th>Bidders</th>
+        <th>Attachments</th>
+      </tr>
+    </table>
+    <div class="btn-div">
+      <button  class="add-row-btn" onclick="appendComponentRow('allComponents')">Add Row</button>
+      <button class="save-btn" onclick="saveComponentForm(event)">Save</button>
+    </div>
+  </body>
+</html>
