@@ -308,3 +308,33 @@ input[type="number"]::-webkit-inner-spin-button {
 .component-order {
 	width: 10px;
 }
+#loadingSection {
+  margin: 20px auto;
+  text-align: center;
+}
+
+.loader-container {
+  display: inline-block;
+}
+
+.spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid #ccc;       /* light track */
+  border-top: 3px solid #242728; /* colored moving part */
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 8px auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+#loadingSection p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #555;
+  font-family: Arial, sans-serif;
+}

@@ -25,6 +25,8 @@ ZOHO.embeddedApp.on("PageLoad", function (data) {
 				if (allComponents.data) {
 					let hasActiveComponent = false;
 					data.data.forEach(component => {
+						$("#allComponents tbody").css("visibility", "collapse");
+
 						if (component.Status == "Active") {
 							console.log("yo");
 							hasActiveComponent = true;
@@ -183,7 +185,7 @@ function appendComponentRow(tableId, existingComponentData, existingComponentLen
 		trClassNames = existingComponentData ? ['existing-component', 'component-row'] : ['component-row'],
 		newRow = createElementWithClass('tr', trClassNames),
 		cellDataArray = [
-			{ elementType: 'input', type: 'text', classes: ['component-order'], defaultValue: existingComponentData?.Order || tbody.getElementsByTagName('tr').length},
+			{ elementType: 'input', type: 'text', classes: ['component-order'], defaultValue: existingComponentData?.Order || tbody.getElementsByTagName('tr').length },
 			{ elementType: 'input', type: 'text', classes: ['component-name', 'required', 'required-data-field'], defaultValue: existingComponentData?.Name || "", errorMsg: "Component name cannot be empty" },
 			{ elementType: 'div', classes: ['relative', 'product-field'], errorMsg: "Product cannot be empty" },
 			{ elementType: 'textarea', classes: ['specification', 'required', 'required-data-field'], defaultValue: existingComponentData?.Specification || "", errorMsg: "Specification cannot be empty" },
@@ -200,6 +202,9 @@ function appendComponentRow(tableId, existingComponentData, existingComponentLen
 	cellDataArray.forEach(elementData => {
 		let newCell = document.createElement('td'),
 			tdElement;
+		if (elementData.classes.includes('component-order')) {
+			newCell.style.display = "none";
+		}
 		tdElement = document.createElement(elementData.elementType);
 		tdElement.type = elementData.type || null;
 		tdElement.value = elementData.defaultValue || null;
@@ -306,7 +311,7 @@ function appendComponentRow(tableId, existingComponentData, existingComponentLen
 	console.log(existingComponentLength);
 	// Get rows as an array
 	var rows = $tbody.find('tr').get();
-	if (existingComponentLength == rows.length - 1) {
+	if (existingComponentLength == rows.length) {
 		rows.sort(function(a, b) {
 				var orderA = parseInt($(a).find('.component-order').val(), 10);
 				var orderB = parseInt($(b).find('.component-order').val(), 10);
@@ -315,6 +320,9 @@ function appendComponentRow(tableId, existingComponentData, existingComponentLen
 		$.each(rows, function(index, row) {
 				$tbody.append(row);
 		});
+		$("#loadingSection").hide();
+		$("#allComponents tbody").css("visibility", "visible");
+
 	}
 }
 

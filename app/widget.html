@@ -34,16 +34,25 @@
   <body>
     <input type="hidden" id="deal-name">
     <table id="allComponents">
-      <tr>
-        <th>Order</th>
-        <th>Component Name</th>
-        <th>Product</th>
-        <th>Specifications</th>
-        <th>Quantity</th>
-        <th>Bidders</th>
-        <th>Attachments</th>
-      </tr>
+      <thead>
+        <tr>
+          <th>Component Name</th>
+          <th>Product</th>
+          <th>Specifications</th>
+          <th>Quantity</th>
+          <th>Bidders</th>
+          <th>Attachments</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
     </table>
+    <div id="loadingSection">
+      <div class="loader-container">
+      <div class="spinner"></div>
+      <p>Loading Components...</p>
+  </div>
+    </div>
     <div class="btn-div">
       <button  class="add-row-btn" onclick="appendComponentRow('allComponents')">Add Row</button>
       <button class="save-btn" onclick="saveComponentForm(event)">Save</button>
