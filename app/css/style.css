@@ -304,3 +304,53 @@ input[type="number"]::-webkit-inner-spin-button {
 	border-radius: 5px;
 	margin-top: 3px;
 }
+/* Dupicate feature 09-02-2025 */
+.component-row {
+  position: relative;  /* important! now .action-buttons will be positioned relative to this row */
+}
+
+/* Your action buttons stay the same */
+.action-buttons {
+  position: absolute;       
+  top: 50%;
+  right: -25px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 3px;
+  border-radius: 8px;
+  z-index: 1000;
+  /* background: rgba(255, 255, 255, 0.9);  */
+  /* box-shadow: 0 2px 6px rgba(0,0,0,0.1); */
+}
+
+.action-buttons span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 28px;       /* smaller size */
+  height: 28px;
+  font-size: 16px;
+  border-radius: 30%;
+  background-color: #ffff;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+
+.action-buttons span:hover {
+  /* transform: scale(1.2); */
+  background-color: #455463; /* soft hover */
+  color: #ffff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.new-component {
+	background-color: #eef0f8;
+}
+
+.field-data-content-con {
+	background-color: white !important;
+}

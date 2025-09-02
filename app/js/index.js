@@ -25,7 +25,7 @@ ZOHO.embeddedApp.on("PageLoad", function (data) {
 					let hasActiveComponent = false;
 					data.data.forEach(component => {
 						if (component.Status == "Active") {
-							console.log("yo");
+							// console.log("yo");
 							hasActiveComponent = true;
 							oldActiveComponentIds.push(component.id)
 							let componentData = {
@@ -186,8 +186,8 @@ function appendComponentRow(tableId, existingComponentData) {
 			{ elementType: 'textarea', classes: ['specification', 'required', 'required-data-field'], defaultValue: existingComponentData?.Specification || "", errorMsg: "Specification cannot be empty" },
 			{ elementType: 'div', classes: ['quantity-field-div', 'required', 'field-data-content-con'], defaultValue: existingComponentData?.Quantity || "", attributes: [['onclick', 'focusOnInputField(event.target)']], errorMsg: "Input valid quantity" },
 			{ elementType: 'div', classes: ['bidders-div', 'relative'], errorMsg: "Add at least one vendor" },
-			{ elementType: 'div', classes: ['attachments-div', 'relative'] },
-			{ elementType: 'button', classes: ['remove-btn'], content: '❌', attributes: [['onclick', 'removeComponentRow(event)']] }
+			{ elementType: 'div', classes: ['attachments-div', 'field-data-content-con', 'relative'] },
+			// { elementType: 'button', classes: ['remove-btn'], content: '❌', attributes: [['onclick', 'removeComponentRow(event)']] }
 		];
 
 	if (existingComponentData) {
@@ -279,18 +279,32 @@ function appendComponentRow(tableId, existingComponentData) {
 		}
 		newRow.appendChild(newCell);
 	});
+		// Create the container div
+	const actionButtons = document.createElement('div');
+	actionButtons.className = 'action-buttons';
+
+	// Delete icon
+	const minusIcon = document.createElement('span');
+	minusIcon.className = 'icon-minus';
+	minusIcon.innerHTML = '✖'; // compact trash icon
+	minusIcon.onclick = () => removeComponentRow(newRow);
+
+	// Duplicate icon
+	const duplicateIcon = document.createElement('span');
+	duplicateIcon.className = 'icon-duplicate';
+	duplicateIcon.innerHTML = '❐'; // compact document icon
+	duplicateIcon.onclick = () => duplicateComponent(event);
+
+	// Append icons to parent
+	!existingComponentData ? actionButtons.appendChild(minusIcon) : actionButtons.appendChild(duplicateIcon);
+
+	// Append to the row
+	newRow.appendChild(actionButtons);
+
 	tbody.appendChild(newRow);
 	if (!existingComponentData) {
 		addEventListenerToQtyField(newRow.querySelector('.qty-input-field'));
 	}
-	// disabling fields
-	// if (dealStage != "Qualification") {
-	// 	$('#allComponents').find('input, textarea').attr('disabled', true).addClass('disabled');
-	// 	$('#allComponents').find('.close').remove();
-	// 	$('#allComponents').find('.field-data-content-con').addClass('disabled').attr('onclick', false)
-	// 	$('#allComponents').find('.remove-btn').remove()
-	// 	$('#allComponents').find('.attachments-div').addClass('disabled').attr('onclick', false)
-	// }
 	if (dealRFQCheckbox == true) {
 		$('#allComponents').find('input, textarea').attr('disabled', true).addClass('disabled');
 		$('#allComponents').find('.close').remove();
@@ -301,10 +315,40 @@ function appendComponentRow(tableId, existingComponentData) {
 	establishListenerOnFileField();
 }
 
-function removeComponentRow(event) {
+function duplicateComponent(event) {
 	xBtn = event.target;
-	componentRow = xBtn.closest('.component-row');
-	componentRow.remove();
+	const row = event.target.closest('tr');
+	const newRow = row.cloneNode(true);
+	newRow.removeAttribute('component-id');
+	newRow.classList.remove('existing-component');
+	newRow.classList.add('new-component');
+	const duplicateIcon = newRow.querySelector('.icon-duplicate');
+	duplicateIcon.remove()
+	const actionButtons = newRow.querySelector('.action-buttons')
+	const minusIcon = document.createElement('span');
+	minusIcon.className = 'icon-minus';
+	minusIcon.innerHTML = '✖'; // compact trash icon
+	minusIcon.onclick = () => removeComponentRow(newRow);
+	actionButtons.appendChild(minusIcon)
+	addEventListenerToQtyField(newRow.querySelector('.qty-input-field'));
+	row.after(newRow);
+	const qtyInputField = newRow.querySelector('.qty-input-field');
+	const backspaceEvent = new KeyboardEvent('keydown', {
+		key: 'Backspace',
+		keyCode: 13,       // legacy property, some listeners check this
+		which: 13,         // legacy property
+		bubbles: true,    // allow event to bubble
+		cancelable: true  // allow preventDefault
+	});
+	// Dispatch the event
+	qtyInputField.dispatchEvent(backspaceEvent);
+}
+
+function removeComponentRow(target) {
+	xBtn = target;
+	// componentRow = xBtn.closest('tr');
+	console.log('Current Row', target);
+	target.remove();
 }
 
 // Product lookup field
